@@ -13,18 +13,30 @@ hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("command -v hyprshutdown >/de
 -- hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("TODO-qs-launcher"))
 
 -- HyprCapture / Hyprspace — only after scripts/install-plugins.sh
-local plugins_on = false
-do
-    local f = io.open((os.getenv("HOME") or "") .. "/.config/hypr/.plugins-enabled", "r")
-    if f then f:close(); plugins_on = true end
+local function marker_present(name)
+    local f = io.open((os.getenv("HOME") or "") .. "/.config/hypr/" .. name, "r")
+    if f then
+        f:close()
+        return true
+    end
+    return false
 end
-if plugins_on then
+
+-- Capture has its own marker. A nil plugin must not throw from the keybind.
+if marker_present(".hyprcapture-enabled") then
     hl.bind(mainMod .. " + C", function()
-        hl.plugin.hyprcapture.open("region")
+        if hl.plugin and hl.plugin.hyprcapture then
+            hl.plugin.hyprcapture.open("region")
+        end
     end)
     hl.bind(mainMod .. " + SHIFT + C", function()
-        hl.plugin.hyprcapture.open("fullscreen")
+        if hl.plugin and hl.plugin.hyprcapture then
+            hl.plugin.hyprcapture.open("fullscreen")
+        end
     end)
+end
+
+if marker_present(".plugins-enabled") then
     hl.bind(mainMod .. " + TAB", function()
         hl.plugin.overview.toggle()
     end)
