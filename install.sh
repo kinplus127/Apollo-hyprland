@@ -40,20 +40,23 @@ ensure_yay() {
   sudo -u "$USER_NAME" git clone --depth 1     https://aur.archlinux.org/yay-bin.git "$build_dir/yay-bin"
   sudo -u "$USER_NAME" bash -c "cd '$build_dir/yay-bin' && makepkg -s --noconfirm"
 
-  pkg="$(find "$build_dir/yay-bin" -maxdepth 1 -name 'yay-bin-*.pkg.tar.*' | head -n1)"
+  # Exclude *-debug-* — unsorted find can pick debug package first (no yay binary)
+  pkg="$(find "$build_dir/yay-bin" -maxdepth 1 -name 'yay-bin-*.pkg.tar.*' ! -name '*-debug-*' | head -n1)"
   if [[ -z "$pkg" ]]; then
     rm -rf "$build_dir"
     echo "==> yay bootstrap failed (no package built)" >&2
     exit 1
   fi
+  echo "==> installing $(basename "$pkg")"
   pacman -U --noconfirm "$pkg"
   rm -rf "$build_dir"
+  hash -r 2>/dev/null || true
 
-  if ! command -v yay >/dev/null 2>&1; then
-    echo "==> yay bootstrap failed" >&2
+  if ! command -v yay >/dev/null 2>&1 && [[ ! -x /usr/bin/yay ]]; then
+    echo "==> yay bootstrap failed (yay not on PATH after install)" >&2
     exit 1
   fi
-  echo "==> yay ready: $(command -v yay)"
+  echo "==> yay ready: $(command -v yay 2>/dev/null || echo /usr/bin/yay)"
 }
 
 install_pacman() {
