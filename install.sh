@@ -94,13 +94,22 @@ install_pacman() {
     qt6-svg
     qt6ct
     gsettings-desktop-schemas
-    # HyprCapture / plugin build deps
+    # HyprCapture / plugin build deps (Arch set from upstream README).
+    # git and base-devel are also pulled by ensure_yay when yay is missing;
+    # list them here so a machine that already has yay still gets the toolchain.
+    base-devel
+    git
     cmake
+    cpio
     nlohmann-json
+    lua
+    glib2
     qt6-base
     layer-shell-qt
+    opencv
     pipewire
     libpipewire
+    fftw
     ffmpeg
     libpulse
     # Clipboard
