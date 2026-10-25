@@ -94,6 +94,15 @@ install_pacman() {
     qt6-svg
     qt6ct
     gsettings-desktop-schemas
+    # HyprCapture / plugin build deps
+    cmake
+    nlohmann-json
+    qt6-base
+    layer-shell-qt
+    pipewire
+    libpipewire
+    ffmpeg
+    libpulse
     # Clipboard
     wl-clipboard
     cliphist
