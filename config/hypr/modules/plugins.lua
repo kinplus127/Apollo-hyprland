@@ -1,8 +1,25 @@
 -- Plugin options (after hyprpm enable + reload)
 -- HyprCapture / hyprbars / Hyprspace
+-- Unknown plugin.* keys error until plugins are installed — gated by marker
+-- created by scripts/install-plugins.sh
 
 -- Allow hyprpm to load plugins when permissions are enforced
 hl.permission("/usr/(bin|local/bin)/hyprpm", "plugin", "allow")
+
+local home = os.getenv("HOME") or ""
+local marker = home .. "/.config/hypr/.plugins-enabled"
+local enabled = false
+do
+    local f = io.open(marker, "r")
+    if f then
+        f:close()
+        enabled = true
+    end
+end
+
+if not enabled then
+    return
+end
 
 hl.config({
     plugin = {
@@ -23,7 +40,6 @@ hl.config({
     },
 })
 
--- hyprbars buttons (R → L). Safe if plugin not loaded yet on first boot.
 pcall(function()
     hl.plugin.hyprbars.add_button({
         bg_color = "rgb(ff4040)",

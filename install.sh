@@ -33,26 +33,30 @@ ensure_yay() {
   pacman -S --needed --noconfirm git base-devel
 
   local build_dir pkg
-  build_dir="$(mktemp -d /tmp/yay-bin.XXXXXX)"
+  # mktemp as the real user — root-owned /tmp/... causes git clone Permission denied
+  build_dir="$(sudo -u "$USER_NAME" mktemp -d /tmp/yay-bin.XXXXXX)"
 
   # Clone + build as the real user (makepkg refuses root)
   sudo -u "$USER_NAME" git clone --depth 1     https://aur.archlinux.org/yay-bin.git "$build_dir/yay-bin"
   sudo -u "$USER_NAME" bash -c "cd '$build_dir/yay-bin' && makepkg -s --noconfirm"
 
-  pkg="$(find "$build_dir/yay-bin" -maxdepth 1 -name 'yay-bin-*.pkg.tar.*' | head -n1)"
+  # Exclude *-debug-* — unsorted find can pick debug package first (no yay binary)
+  pkg="$(find "$build_dir/yay-bin" -maxdepth 1 -name 'yay-bin-*.pkg.tar.*' ! -name '*-debug-*' | head -n1)"
   if [[ -z "$pkg" ]]; then
     rm -rf "$build_dir"
     echo "==> yay bootstrap failed (no package built)" >&2
     exit 1
   fi
+  echo "==> installing $(basename "$pkg")"
   pacman -U --noconfirm "$pkg"
   rm -rf "$build_dir"
+  hash -r 2>/dev/null || true
 
-  if ! command -v yay >/dev/null 2>&1; then
-    echo "==> yay bootstrap failed" >&2
+  if ! command -v yay >/dev/null 2>&1 && [[ ! -x /usr/bin/yay ]]; then
+    echo "==> yay bootstrap failed (yay not on PATH after install)" >&2
     exit 1
   fi
-  echo "==> yay ready: $(command -v yay)"
+  echo "==> yay ready: $(command -v yay 2>/dev/null || echo /usr/bin/yay)"
 }
 
 install_pacman() {
@@ -225,6 +229,16 @@ install_hypr_config() {
   done
 }
 
+
+fix_user_home_ownership() {
+  # install -d / fc-cache under sudo can leave root-owned dirs fish cannot write
+  echo "==> ensure $USER_NAME owns ~/.local and ~/.config"
+  for d in "$USER_HOME/.local" "$USER_HOME/.config"; do
+    [[ -e "$d" ]] || continue
+    chown -R "$USER_NAME:$USER_NAME" "$d" || true
+  done
+}
+
 set_fish_shell() {
   local fish_path
   fish_path="$(command -v fish)"
@@ -262,6 +276,7 @@ main() {
   install_toolkit_fonts
   install_hypr_config
   set_fish_shell
+  fix_user_home_ownership
 
   echo
   echo "Part 1 done."
