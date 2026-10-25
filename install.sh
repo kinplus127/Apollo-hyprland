@@ -33,7 +33,8 @@ ensure_yay() {
   pacman -S --needed --noconfirm git base-devel
 
   local build_dir pkg
-  build_dir="$(mktemp -d /tmp/yay-bin.XXXXXX)"
+  # mktemp as the real user — root-owned /tmp/... causes git clone Permission denied
+  build_dir="$(sudo -u "$USER_NAME" mktemp -d /tmp/yay-bin.XXXXXX)"
 
   # Clone + build as the real user (makepkg refuses root)
   sudo -u "$USER_NAME" git clone --depth 1     https://aur.archlinux.org/yay-bin.git "$build_dir/yay-bin"
