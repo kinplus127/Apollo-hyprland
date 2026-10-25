@@ -225,7 +225,7 @@ install_fontconfig() {
 install_hypr_config() {
   local dest="$USER_HOME/.config/hypr"
   echo "==> hypr config → $dest"
-  install -d -m 755 -o "$USER_NAME" -g "$USER_NAME" "$dest/modules"
+  install -d -m 755 -o "$USER_NAME" -g "$USER_NAME" "$dest/modules" "$dest/scripts"
   install -m 644 -o "$USER_NAME" -g "$USER_NAME" \
     "$ROOT/config/hypr/hyprland.lua" "$dest/hyprland.lua"
   install -m 644 -o "$USER_NAME" -g "$USER_NAME" \
@@ -236,6 +236,32 @@ install_hypr_config() {
   for f in "$ROOT/config/hypr/modules/"*.lua; do
     install -m 644 -o "$USER_NAME" -g "$USER_NAME" "$f" "$dest/modules/"
   done
+  install -m 755 -o "$USER_NAME" -g "$USER_NAME" \
+    "$ROOT/scripts/set-wallpaper.sh" "$dest/scripts/set-wallpaper.sh"
+}
+
+# Exact copy only (no convert/resize). Mirrors Apollo's wallpaper install.
+install_wallpapers() {
+  local src="$ROOT/wallpapers"
+  local dest="${XDG_PICTURES_DIR:-$USER_HOME/Pictures}/wallpapers"
+  local count f
+
+  if [[ ! -d "$src" ]]; then
+    echo "==> wallpapers: no directory $src — skip"
+    return 0
+  fi
+
+  count="$(find "$src" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "$count" -eq 0 ]]; then
+    echo "==> wallpapers: no jpg/jpeg/png/webp in $src — skip"
+    return 0
+  fi
+
+  echo "==> wallpapers: install $count file(s) → $dest (exact copy)"
+  install -d -m 755 -o "$USER_NAME" -g "$USER_NAME" "$dest"
+  while IFS= read -r -d '' f; do
+    install -m 0644 -o "$USER_NAME" -g "$USER_NAME" "$f" "$dest/$(basename "$f")"
+  done < <(find "$src" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print0)
 }
 
 
@@ -284,6 +310,7 @@ main() {
   install_fontconfig
   install_toolkit_fonts
   install_hypr_config
+  install_wallpapers
   set_fish_shell
   fix_user_home_ownership
 
