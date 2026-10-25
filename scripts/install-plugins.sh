@@ -35,7 +35,7 @@ if [[ "$capture_ok" -eq 0 ]] && ! hyprpm list 2>/dev/null | grep -F 'hyprcapture
 else
   rm -f "$CAPTURE_MARKER"
   echo "==> HyprCapture skipped (build/enable failed). Super+C stays inactive until capture works."
-  echo "    Try: sudo pacman -S --needed cmake nlohmann-json qt6-base qt6-wayland layer-shell-qt pipewire libpipewire ffmpeg libpulse"
+  echo "    Try: sudo pacman -S --needed base-devel cmake git cpio nlohmann-json lua glib2 qt6-base qt6-svg qt6-wayland layer-shell-qt opencv pipewire libpipewire fftw libpulse ffmpeg wl-clipboard"
   echo "    Then: hyprpm add https://github.com/gfhdhytghd/HyprCapture && hyprpm enable hyprcapture && hyprpm reload"
 fi
 
