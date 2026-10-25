@@ -1,0 +1,6 @@
+[General]
+font=Geist,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+menuFont=Geist,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+smallestReadableFont=Geist,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+toolBarFont=Geist,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+fixed=Geist Mono,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1

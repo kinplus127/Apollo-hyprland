@@ -1,0 +1,12 @@
+hl.on("hyprland.start", function()
+    -- Reload enabled hyprpm plugins (hyprbars / hyprcapture / Hyprspace)
+    hl.exec_cmd("hyprpm reload -n")
+
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("quickshell")
+    hl.exec_cmd("awww-daemon")
+    hl.exec_cmd("wl-clip-persist --clipboard both")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+end)
