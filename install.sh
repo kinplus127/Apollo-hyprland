@@ -229,6 +229,16 @@ install_hypr_config() {
   done
 }
 
+
+fix_user_home_ownership() {
+  # install -d / fc-cache under sudo can leave root-owned dirs fish cannot write
+  echo "==> ensure $USER_NAME owns ~/.local and ~/.config"
+  for d in "$USER_HOME/.local" "$USER_HOME/.config"; do
+    [[ -e "$d" ]] || continue
+    chown -R "$USER_NAME:$USER_NAME" "$d" || true
+  done
+}
+
 set_fish_shell() {
   local fish_path
   fish_path="$(command -v fish)"
@@ -266,6 +276,7 @@ main() {
   install_toolkit_fonts
   install_hypr_config
   set_fish_shell
+  fix_user_home_ownership
 
   echo
   echo "Part 1 done."

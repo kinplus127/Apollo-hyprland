@@ -12,18 +12,23 @@ hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("command -v hyprshutdown >/de
 -- QS launcher (wire IPC / command when ready)
 -- hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("TODO-qs-launcher"))
 
--- HyprCapture
-hl.bind(mainMod .. " + C", function()
-    hl.plugin.hyprcapture.open("region")
-end)
-hl.bind(mainMod .. " + SHIFT + C", function()
-    hl.plugin.hyprcapture.open("fullscreen")
-end)
-
--- Hyprspace overview (also: vertical workspace swipe can open it)
-hl.bind(mainMod .. " + TAB", function()
-    hl.plugin.overview.toggle()
-end)
+-- HyprCapture / Hyprspace — only after scripts/install-plugins.sh
+local plugins_on = false
+do
+    local f = io.open((os.getenv("HOME") or "") .. "/.config/hypr/.plugins-enabled", "r")
+    if f then f:close(); plugins_on = true end
+end
+if plugins_on then
+    hl.bind(mainMod .. " + C", function()
+        hl.plugin.hyprcapture.open("region")
+    end)
+    hl.bind(mainMod .. " + SHIFT + C", function()
+        hl.plugin.hyprcapture.open("fullscreen")
+    end)
+    hl.bind(mainMod .. " + TAB", function()
+        hl.plugin.overview.toggle()
+    end)
+end
 
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(P.fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
