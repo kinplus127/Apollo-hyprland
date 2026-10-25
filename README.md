@@ -1,4 +1,4 @@
-# Apollo-hyprlans
+# Apollo-hyprland
 
 Arch Linux Hyprland (Lua config, ≥0.55) install + setup draft.
 
