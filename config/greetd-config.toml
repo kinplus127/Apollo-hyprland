@@ -1,0 +1,9 @@
+# Installed to /etc/greetd/config.toml by install.sh (part 1).
+# Password login via tuigreet; session command is start-hyprland.
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --cmd start-hyprland --time --remember --remember-user-session"
+user = "greeter"
